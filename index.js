@@ -15,8 +15,9 @@ wCap.set(cv.CAP_PROP_FRAME_HEIGHT, 300);
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
-
+this.idx = 0;
 setInterval(()=>{
+    this.idx += 1;
     const frame = wCap.read();
     const image = cv.imencode('.jpg', frame).toString('base64');
     const request = require('request');
@@ -25,10 +26,14 @@ setInterval(()=>{
         image: 'image',
         image: cv.imencode('.jpg', frame)
     };
-    request.post({url:api_rul, formData:_formData,
-    headers:{'X-NCP-APIGW-API-KEY-ID': process.env.CLIENT_ID, 'X-NCP-APIGW-API-KEY': process.env.CLIENT_SECRET}}, function(err, httpResponse, body){
-        console.log(body);
-    })
+    if(this.idx % 100 == 0){
+        request.post({url:api_rul, formData:_formData,
+            headers:{'X-NCP-APIGW-API-KEY-ID': process.env.CLIENT_ID, 'X-NCP-APIGW-API-KEY': process.env.CLIENT_SECRET}}, function(err, httpResponse, body){
+                console.log(body);
+        });
+        this.idx = 0;
+    }
+
     io.emit('image', image);
 }, 1000 / FPS)
 
