@@ -6,7 +6,7 @@ const server = require('http').Server(app);
 const io = require('socket.io')(server);
 require('dotenv').config();
 
-const FPS = 30;
+const FPS = 10;
 
 const wCap = new cv.VideoCapture(0);
 wCap.set(cv.CAP_PROP_FRAME_WIDTH, 300);
@@ -29,6 +29,18 @@ setInterval(()=>{
     if(this.idx % 100 == 0){
         request.post({url:api_rul, formData:_formData,
             headers:{'X-NCP-APIGW-API-KEY-ID': process.env.CLIENT_ID, 'X-NCP-APIGW-API-KEY': process.env.CLIENT_SECRET}}, function(err, httpResponse, body){
+                const timezoneOffset = new Date().getTimezoneOffset() * 60000;
+                const timezoneDate = new Date(Date.now() - timezoneOffset);
+
+                let options = {
+                    uri: `http://${process.env.ELASTIC_HOST}:9200/customer/external/` + timezoneDate.toISOString(),
+                    method: 'POST',
+                    body:JSON.parse(body),
+                    json:true //json으로 보낼경우 true로 해주어야 header값이 json으로 설정됩니다.
+                };
+                request.post(options,function(er,res,bod){
+                    console.log(bod);
+                })
                 console.log(body);
         });
         this.idx = 0;
