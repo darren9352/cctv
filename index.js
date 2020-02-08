@@ -4,6 +4,7 @@ const path = require('path');
 const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
+const jpeg = require('jpeg-js');
 require('dotenv').config();
 
 const FPS = 10;
@@ -16,9 +17,10 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 this.idx = 0;
-setInterval(()=>{
+/*setInterval(()=>{
     this.idx += 1;
     const frame = wCap.read();
+
     const image = cv.imencode('.jpg', frame).toString('base64');
     const request = require('request');
     const api_rul = 'https://naveropenapi.apigw.ntruss.com/vision/v1/face';
@@ -47,6 +49,6 @@ setInterval(()=>{
     }
 
     io.emit('image', image);
-}, 1000 / FPS)
+}, 1000 / FPS)*/
 
 server.listen(3000);
